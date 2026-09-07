@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Users, Calendar, Settings, Sparkles, ListTodo } from 'lucide-react';
+import { Users, Calendar, Settings, Sparkles, ListTodo, Droplet } from 'lucide-react';
 import { getInitialData, saveUsers, saveTasks, saveHistory } from './utils/store';
 import { generateDailySchedule } from './utils/randomizer';
 import UserList from './components/UserList';
@@ -14,6 +14,16 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
   const [todaySchedule, setTodaySchedule] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem('app-theme') || 'boutique');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('app-theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => prev === 'boutique' ? 'nature' : 'boutique');
+  };
 
   useEffect(() => {
     const data = getInitialData();
@@ -59,18 +69,27 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-textMain pb-20">
+    <div className="min-h-screen bg-background text-textMain pb-20 font-sans selection:bg-primary/20">
       {/* Header */}
-      <header className="bg-surface border-b border-white/5 sticky top-0 z-10 backdrop-blur-md bg-surface/80">
+      <header className="bg-surface/90 border-b border-primary/10 sticky top-0 z-10 backdrop-blur-md shadow-sm">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/20 p-2 rounded-xl text-primary">
-              <Sparkles size={24} />
+            <div className="text-primary">
+              <Sparkles size={24} strokeWidth={1.5} />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">RandomTasks</h1>
+            <h1 className="text-2xl font-serif font-semibold tracking-wide text-primary">RandomTasks</h1>
           </div>
-          <div className="text-sm font-medium text-textMuted bg-white/5 px-3 py-1.5 rounded-full">
-            {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-medium text-textMuted bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10 hidden sm:block">
+              {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+            </div>
+            <button 
+              onClick={handleToggleTheme}
+              className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              title={`Cambiar a estilo ${theme === 'boutique' ? 'Nature 3D' : 'Boutique'}`}
+            >
+              {theme === 'boutique' ? <Droplet size={20} /> : <Sparkles size={20} />}
+            </button>
           </div>
         </div>
       </header>
@@ -100,7 +119,7 @@ function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-white/5 pb-safe">
+      <nav className="fixed bottom-0 w-full bg-surface/95 backdrop-blur-md border-t border-primary/10 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
         <div className="max-w-md mx-auto flex justify-around p-2">
           <button 
             onClick={() => setActiveTab('schedule')}

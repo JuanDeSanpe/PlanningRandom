@@ -1,17 +1,79 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0f172a;
-  --color-surface: #1e293b;
-  --color-primary: #3b82f6;
-  --color-primaryHover: #2563eb;
-  --color-accent: #10b981;
-  --color-textMain: #f8fafc;
-  --color-textMuted: #94a3b8;
+  --color-background: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-primary: var(--app-primary);
+  --color-primaryHover: var(--app-primary-hover);
+  --color-accent: var(--app-accent);
+  --color-textMain: var(--app-text-main);
+  --color-textMuted: var(--app-text-muted);
+  
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+:root {
+  /* Tema Boutique (Por Defecto) */
+  --app-bg: #F8F5F0;
+  --app-surface: #FFFFFF;
+  --app-primary: #B06D51;
+  --app-primary-hover: #9A5C42;
+  --app-accent: #546244;
+  --app-text-main: #3D3833;
+  --app-text-muted: #8C847A;
+  
+  --app-shadow-card: 0 4px 6px -1px rgba(0,0,0,0.05);
+  --app-shadow-btn: 0 4px 6px -1px rgba(176, 109, 81, 0.2);
+  --app-shadow-btn-active: 0 1px 2px rgba(176, 109, 81, 0.2);
+  --app-shadow-btn-color: rgba(176, 109, 81, 0.2);
+  --app-btn-offset: 1px;
+}
+
+[data-theme='nature'] {
+  /* Tema Nature 3D */
+  --app-bg: #1f3627;
+  --app-surface: #2b4935;
+  --app-primary: #D1AD85;
+  --app-primary-hover: #e2c19e;
+  --app-accent: #78523c;
+  --app-text-main: #F5F0EA;
+  --app-text-muted: #9AAEA4;
+  
+  /* Sombras 3D Inmersivas */
+  --app-shadow-card: 8px 8px 16px rgba(0,0,0,0.4), -4px -4px 12px rgba(255,255,255,0.03);
+  --app-shadow-btn: 0px 6px 0px #8C6F51, 0px 10px 15px rgba(0,0,0,0.4);
+  --app-shadow-btn-active: 0px 0px 0px #8C6F51, 0px 2px 5px rgba(0,0,0,0.4);
+  --app-shadow-btn-color: #8C6F51;
+  --app-btn-offset: 6px;
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-textMain);
+  background-color: var(--app-bg);
+  color: var(--app-text-main);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Utilidades para los efectos 3D y tarjetas */
+.card-3d-effect {
+  box-shadow: var(--app-shadow-card);
+  transition: box-shadow 0.5s ease, transform 0.3s ease, background-color 0.5s ease;
+}
+
+.btn-3d-effect {
+  box-shadow: var(--app-shadow-btn);
+  transform: translateY(0);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none !important;
+}
+
+.btn-3d-effect:active:not(:disabled) {
+  box-shadow: var(--app-shadow-btn-active);
+  transform: translateY(var(--app-btn-offset));
+}
+
+.btn-3d-effect:disabled {
+  box-shadow: none;
+  transform: translateY(0);
+  opacity: 0.5;
 }
