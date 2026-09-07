@@ -41,7 +41,7 @@ export const generateDailySchedule = (users, tasks, history) => {
   };
 
   const getCandidate = (taskId, roleFilter = null, mustBeProtected = false) => {
-    let candidates = users.filter(u => availableUsers.has(u.id));
+    let candidates = users.filter(u => availableUsers.has(u.id) && u.active !== false);
     
     if (roleFilter) {
       candidates = candidates.filter(u => u.role === roleFilter);

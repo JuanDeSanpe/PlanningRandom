@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Shield, User } from 'lucide-react';
+import { Plus, Trash2, Shield, User, Power, PowerOff } from 'lucide-react';
 
 export default function UserList({ users, onUpdate, tasks }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -17,7 +17,8 @@ export default function UserList({ users, onUpdate, tasks }) {
       id: Date.now().toString(),
       name: newName.trim(),
       role: newRole,
-      protectedTasks: newProtectedTasks
+      protectedTasks: newProtectedTasks,
+      active: true
     };
 
     onUpdate([...users, newUser]);
@@ -29,6 +30,10 @@ export default function UserList({ users, onUpdate, tasks }) {
 
   const handleDelete = (id) => {
     onUpdate(users.filter(u => u.id !== id));
+  };
+
+  const toggleActive = (id) => {
+    onUpdate(users.map(u => u.id === id ? { ...u, active: !u.active } : u));
   };
 
   const toggleProtectedTask = (taskName) => {
@@ -114,13 +119,19 @@ export default function UserList({ users, onUpdate, tasks }) {
 
       <div className="grid gap-3">
         {users.map(user => (
-          <div key={user.id} className="bg-surface border border-white/5 p-4 rounded-2xl flex items-center justify-between group">
+          <div key={user.id} className={`bg-surface border border-white/5 p-4 rounded-2xl flex items-center justify-between group transition-all ${user.active ? '' : 'opacity-50 grayscale'}`}>
             <div className="flex items-center gap-4">
-              <div className="bg-black/20 p-2.5 rounded-full text-textMuted">
-                <User size={20} />
-              </div>
+              <button 
+                onClick={() => toggleActive(user.id)}
+                className={`p-2.5 rounded-full transition-colors ${user.active ? 'bg-primary/20 text-primary hover:bg-primary/30' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'}`}
+                title={user.active ? "Desactivar usuario (Dar de baja)" : "Activar usuario"}
+              >
+                {user.active ? <Power size={20} /> : <PowerOff size={20} />}
+              </button>
               <div>
-                <h3 className="font-medium text-base leading-tight">{user.name}</h3>
+                <h3 className="font-medium text-base leading-tight">
+                  {user.name} {user.active ? '' : <span className="text-xs text-red-400 font-normal ml-2">(De baja)</span>}
+                </h3>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${user.role === 'asumidor' ? 'bg-primary/20 text-primary' : 'bg-white/10 text-textMuted'}`}>
                     {user.role.replace('-', ' ')}
@@ -137,6 +148,7 @@ export default function UserList({ users, onUpdate, tasks }) {
             <button 
               onClick={() => handleDelete(user.id)}
               className="text-textMuted hover:text-red-400 p-2 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
+              title="Eliminar usuario"
             >
               <Trash2 size={18} />
             </button>

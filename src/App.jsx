@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Users, Calendar, Settings, Sparkles } from 'lucide-react';
+import { Users, Calendar, Settings, Sparkles, ListTodo } from 'lucide-react';
 import { getInitialData, saveUsers, saveTasks, saveHistory } from './utils/store';
 import { generateDailySchedule } from './utils/randomizer';
 import UserList from './components/UserList';
 import DailySchedule from './components/DailySchedule';
+import TaskList from './components/TaskList';
 
 function App() {
   const [activeTab, setActiveTab] = useState('schedule');
@@ -52,6 +53,11 @@ function App() {
     saveUsers(newUsers);
   };
 
+  const updateTaskList = (newTasks) => {
+    setTasks(newTasks);
+    saveTasks(newTasks);
+  };
+
   return (
     <div className="min-h-screen bg-background text-textMain pb-20">
       {/* Header */}
@@ -85,6 +91,12 @@ function App() {
             tasks={tasks}
           />
         )}
+        {activeTab === 'tasks' && (
+          <TaskList 
+            tasks={tasks} 
+            onUpdate={updateTaskList} 
+          />
+        )}
       </main>
 
       {/* Bottom Navigation */}
@@ -107,6 +119,15 @@ function App() {
           >
             <Users size={24} className={activeTab === 'users' ? 'scale-110' : ''} />
             <span className="text-[10px] mt-1 font-medium">Usuarios</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('tasks')}
+            className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+              activeTab === 'tasks' ? 'text-primary' : 'text-textMuted hover:text-textMain'
+            }`}
+          >
+            <ListTodo size={24} className={activeTab === 'tasks' ? 'scale-110' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Tareas</span>
           </button>
         </div>
       </nav>
