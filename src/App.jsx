@@ -1,122 +1,117 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Users, Calendar, Settings, Sparkles } from 'lucide-react';
+import { getInitialData, saveUsers, saveTasks, saveHistory } from './utils/store';
+import { generateDailySchedule } from './utils/randomizer';
+import UserList from './components/UserList';
+import DailySchedule from './components/DailySchedule';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('schedule');
+  const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [todaySchedule, setTodaySchedule] = useState(null);
+
+  useEffect(() => {
+    const data = getInitialData();
+    setUsers(data.users);
+    setTasks(data.tasks);
+    setHistory(data.history);
+    
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const existingToday = data.history.find(h => h.date === todayStr);
+    if (existingToday) {
+      setTodaySchedule(existingToday);
+    }
+  }, []);
+
+  const handleGenerate = () => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const newSchedule = generateDailySchedule(users, tasks, history);
+    
+    const flatAssignments = newSchedule.flatMap(s => 
+      s.users.map(u => ({ taskId: s.taskId, userId: u.id }))
+    );
+
+    const historyRecord = {
+      date: todayStr,
+      assignments: flatAssignments,
+      displaySchedule: newSchedule,
+    };
+
+    const newHistory = [historyRecord, ...history];
+    setHistory(newHistory);
+    saveHistory(newHistory);
+    setTodaySchedule(historyRecord);
+  };
+
+  const updateUserList = (newUsers) => {
+    setUsers(newUsers);
+    saveUsers(newUsers);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-background text-textMain pb-20">
+      {/* Header */}
+      <header className="bg-surface border-b border-white/5 sticky top-0 z-10 backdrop-blur-md bg-surface/80">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/20 p-2 rounded-xl text-primary">
+              <Sparkles size={24} />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight">RandomTasks</h1>
+          </div>
+          <div className="text-sm font-medium text-textMuted bg-white/5 px-3 py-1.5 rounded-full">
+            {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 pt-8">
+        {activeTab === 'schedule' && (
+          <DailySchedule 
+            schedule={todaySchedule} 
+            onGenerate={handleGenerate} 
+            tasks={tasks}
+          />
+        )}
+        {activeTab === 'users' && (
+          <UserList 
+            users={users} 
+            onUpdate={updateUserList} 
+            tasks={tasks}
+          />
+        )}
+      </main>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-white/5 pb-safe">
+        <div className="max-w-md mx-auto flex justify-around p-2">
+          <button 
+            onClick={() => setActiveTab('schedule')}
+            className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+              activeTab === 'schedule' ? 'text-primary' : 'text-textMuted hover:text-textMain'
+            }`}
+          >
+            <Calendar size={24} className={activeTab === 'schedule' ? 'scale-110' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Sorteo</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('users')}
+            className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+              activeTab === 'users' ? 'text-primary' : 'text-textMuted hover:text-textMain'
+            }`}
+          >
+            <Users size={24} className={activeTab === 'users' ? 'scale-110' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Usuarios</span>
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </nav>
+    </div>
+  );
 }
 
-export default App
+export default App;
