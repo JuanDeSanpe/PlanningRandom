@@ -91,13 +91,13 @@
   --task-icon-text-l: 82%;
 
   /* Cápsula de tareas completa (Modo Oscuro / Nature 3D) */
-  --task-capsule-l1: 29%;
-  --task-capsule-l2: 21%;
-  --task-capsule-border-l: 62%;
-  --task-capsule-border-a: 0.45;
-  --task-capsule-border-hover-l: 75%;
-  --task-capsule-shadow-l: 10%;
-  --task-capsule-divider: hsla(var(--task-hue, 42), 40%, 75%, 0.15);
+  --task-capsule-l1: 33%;
+  --task-capsule-l2: 23%;
+  --task-capsule-border-l: 65%;
+  --task-capsule-border-a: 0.5;
+  --task-capsule-border-hover-l: 78%;
+  --task-capsule-shadow-l: 12%;
+  --task-capsule-divider: hsla(var(--task-hue, 42), 40%, 75%, 0.18);
 }
 
 body {
