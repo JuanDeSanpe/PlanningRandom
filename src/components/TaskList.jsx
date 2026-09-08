@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Pencil, Check, X } from 'lucide-react';
 import { getTaskHue, getTaskBadgeText, TaskIcon } from '../utils/themeColors';
 
 export default function TaskList({ tasks, onUpdate }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState('regular'); // 'regular', 'protected', 'cocina'
+
+  // Estado para la edición de categorías/tareas
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState('regular');
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -24,7 +29,24 @@ export default function TaskList({ tasks, onUpdate }) {
   };
 
   const handleDelete = (id) => {
+    if (editingTaskId === id) setEditingTaskId(null);
     onUpdate(tasks.filter(t => t.id !== id));
+  };
+
+  const startEditing = (task) => {
+    setEditingTaskId(task.id);
+    setEditName(task.name);
+    setEditType(task.type);
+  };
+
+  const cancelEditing = () => {
+    setEditingTaskId(null);
+  };
+
+  const handleSaveEdit = (taskId) => {
+    if (!editName.trim()) return;
+    onUpdate(tasks.map(t => t.id === taskId ? { ...t, name: editName.trim(), type: editType } : t));
+    setEditingTaskId(null);
   };
 
   return (
@@ -32,7 +54,7 @@ export default function TaskList({ tasks, onUpdate }) {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-serif text-primary italic">Gestión de Tareas</h2>
         <button 
-          onClick={() => setIsAdding(!isAdding)}
+          onClick={() => { setIsAdding(!isAdding); setEditingTaskId(null); }}
           className="bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2"
         >
           <Plus size={16} /> Añadir
@@ -42,7 +64,7 @@ export default function TaskList({ tasks, onUpdate }) {
       {isAdding && (
         <form onSubmit={handleAdd} className="bg-surface p-6 rounded-[2rem] border-t border-white/5 space-y-5 animate-in fade-in slide-in-from-top-4 card-3d-effect">
           <div>
-            <label className="block text-sm font-serif text-primary mb-2">Nombre de la Tarea</label>
+            <label className="block text-sm font-serif text-primary mb-2">Nombre de la Categoría / Tarea</label>
             <input 
               type="text" 
               value={newName}
@@ -99,13 +121,99 @@ export default function TaskList({ tasks, onUpdate }) {
 
       <div className="grid gap-4">
         {tasks.map(task => {
-          const hue = getTaskHue(task.name, task.type);
-          const badgeText = getTaskBadgeText(task);
+          const isEditing = editingTaskId === task.id;
+          const currentHue = getTaskHue(isEditing ? editName || task.name : task.name, isEditing ? editType : task.type);
+          const badgeText = getTaskBadgeText(isEditing ? { name: editName || task.name, type: editType } : task);
+
+          if (isEditing) {
+            return (
+              <div 
+                key={task.id}
+                style={{ '--task-hue': currentHue }}
+                className="task-card-capsule p-5 rounded-3xl space-y-4 card-3d-effect animate-in fade-in"
+              >
+                <div className="flex items-center justify-between border-b task-card-divider pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-full border task-icon-box">
+                      <TaskIcon name={editName || task.name} type={editType} size={18} />
+                    </div>
+                    <h3 className="font-serif text-lg text-textMain">Modificar Categoría / Tarea</h3>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border task-pill">
+                    {badgeText}
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-serif text-primary mb-1.5">Nombre de la Categoría / Tarea</label>
+                  <input 
+                    type="text" 
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveEdit(task.id);
+                      if (e.key === 'Escape') cancelEditing();
+                    }}
+                    className="w-full bg-background border border-black/10 rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 text-textMain text-sm shadow-inner"
+                    placeholder="Escribe el nuevo nombre..."
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-serif text-primary mb-1.5">Tipo de Tarea</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditType('regular')}
+                      style={{ '--task-hue': 95 }}
+                      className={`py-2 px-3 rounded-xl text-center text-xs font-medium transition-all border ${editType === 'regular' ? 'task-pill shadow-sm border-current font-semibold' : 'bg-background/80 border-black/5 text-textMuted hover:border-black/10'}`}
+                    >
+                      Regular
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditType('protected')}
+                      style={{ '--task-hue': 42 }}
+                      className={`py-2 px-3 rounded-xl text-center text-xs font-medium transition-all border ${editType === 'protected' ? 'task-pill shadow-sm border-current font-semibold' : 'bg-background/80 border-black/5 text-textMuted hover:border-black/10'}`}
+                    >
+                      Protegida VIP
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditType('cocina')}
+                      style={{ '--task-hue': 18 }}
+                      className={`py-2 px-3 rounded-xl text-center text-xs font-medium transition-all border ${editType === 'cocina' ? 'task-pill shadow-sm border-current font-semibold' : 'bg-background/80 border-black/5 text-textMuted hover:border-black/10'}`}
+                    >
+                      Cocina
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2 justify-end">
+                  <button 
+                    type="button" 
+                    onClick={cancelEditing} 
+                    className="px-4 py-2 bg-black/5 hover:bg-black/10 text-textMuted rounded-full text-xs font-medium transition-all flex items-center gap-1.5"
+                  >
+                    <X size={14} /> Cancelar
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => handleSaveEdit(task.id)} 
+                    className="px-5 py-2 bg-primary text-surface rounded-full text-xs font-medium transition-all btn-3d-effect flex items-center gap-1.5"
+                  >
+                    <Check size={14} /> Guardar Cambios
+                  </button>
+                </div>
+              </div>
+            );
+          }
 
           return (
             <div 
               key={task.id} 
-              style={{ '--task-hue': hue }}
+              style={{ '--task-hue': currentHue }}
               className="task-card-capsule p-4 rounded-3xl flex items-center justify-between group transition-all card-3d-effect"
             >
               <div className="flex items-center gap-4">
@@ -121,13 +229,22 @@ export default function TaskList({ tasks, onUpdate }) {
                   </div>
                 </div>
               </div>
-              <button 
-                onClick={() => handleDelete(task.id)}
-                className="text-textMuted hover:text-primary p-2 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
-                title="Eliminar tarea"
-              >
-                <Trash2 size={18} />
-              </button>
+              <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-all">
+                <button 
+                  onClick={() => startEditing(task)}
+                  className="text-textMuted hover:text-primary p-2 rounded-full hover:bg-black/5 transition-all"
+                  title="Modificar nombre o tipo de tarea"
+                >
+                  <Pencil size={18} />
+                </button>
+                <button 
+                  onClick={() => handleDelete(task.id)}
+                  className="text-textMuted hover:text-primary p-2 rounded-full hover:bg-black/5 transition-all"
+                  title="Eliminar tarea"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
           );
         })}

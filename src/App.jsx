@@ -64,6 +64,24 @@ function App() {
   };
 
   const updateTaskList = (newTasks) => {
+    // Sincronizar nombres si alguna tarea/categoría ha cambiado de nombre
+    const renamedMap = {};
+    tasks.forEach(oldTask => {
+      const match = newTasks.find(nt => nt.id === oldTask.id);
+      if (match && match.name !== oldTask.name) {
+        renamedMap[oldTask.name] = match.name;
+      }
+    });
+
+    if (Object.keys(renamedMap).length > 0) {
+      const updatedUsers = users.map(u => ({
+        ...u,
+        protectedTasks: (u.protectedTasks || []).map(tName => renamedMap[tName] || tName)
+      }));
+      setUsers(updatedUsers);
+      saveUsers(updatedUsers);
+    }
+
     setTasks(newTasks);
     saveTasks(newTasks);
   };
