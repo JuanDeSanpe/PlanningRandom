@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Shield, User, Power, PowerOff } from 'lucide-react';
+import { Plus, Trash2, Shield, Power, PowerOff } from 'lucide-react';
+import { getTaskHue } from '../utils/themeColors';
 
 export default function UserList({ users, onUpdate, tasks }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -76,16 +77,16 @@ export default function UserList({ users, onUpdate, tasks }) {
               <button
                 type="button"
                 onClick={() => setNewRole('asumidor')}
-                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'asumidor' ? 'bg-primary/10 border-primary/30 text-primary shadow-sm' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'asumidor' ? 'role-asumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
-                Asumidor
+                Asumidor (Azul)
               </button>
               <button
                 type="button"
                 onClick={() => setNewRole('no-asumidor')}
-                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'no-asumidor' ? 'bg-primary/10 border-primary/30 text-primary shadow-sm' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'no-asumidor' ? 'role-noasumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
-                No Asumidor
+                No Asumidor (Rosado)
               </button>
             </div>
           </div>
@@ -93,16 +94,21 @@ export default function UserList({ users, onUpdate, tasks }) {
           <div>
             <label className="block text-sm font-serif text-primary mb-2">Tareas Protegidas (Opcional)</label>
             <div className="flex flex-wrap gap-2">
-              {protectedTaskOptions.map(taskName => (
-                <button
-                  key={taskName}
-                  type="button"
-                  onClick={() => toggleProtectedTask(taskName)}
-                  className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${newProtectedTasks.includes(taskName) ? 'bg-accent/10 border-accent/30 text-accent shadow-sm' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
-                >
-                  {taskName}
-                </button>
-              ))}
+              {protectedTaskOptions.map(taskName => {
+                const isSelected = newProtectedTasks.includes(taskName);
+                const hue = getTaskHue(taskName);
+                return (
+                  <button
+                    key={taskName}
+                    type="button"
+                    onClick={() => toggleProtectedTask(taskName)}
+                    style={{ '--task-hue': hue }}
+                    className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${isSelected ? 'task-pill font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                  >
+                    {taskName}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -133,14 +139,20 @@ export default function UserList({ users, onUpdate, tasks }) {
                   {user.name} {user.active ? '' : <span className="text-xs text-textMuted font-sans italic ml-2">(De baja)</span>}
                 </h3>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${user.role === 'asumidor' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-black/5 text-textMuted border border-black/5'}`}>
+                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${user.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'}`}>
                     {user.role.replace('-', ' ')}
                   </span>
                   {user.protectedTasks.length > 0 && (
-                    <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                      <Shield size={10} />
-                      {user.protectedTasks.join(', ')}
-                    </span>
+                    user.protectedTasks.map(taskName => (
+                      <span 
+                        key={taskName}
+                        style={{ '--task-hue': getTaskHue(taskName) }}
+                        className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border task-pill"
+                      >
+                        <Shield size={10} />
+                        {taskName}
+                      </span>
+                    ))
                   )}
                 </div>
               </div>

@@ -28,6 +28,23 @@
   --app-shadow-btn-active: 0 1px 2px rgba(176, 109, 81, 0.2);
   --app-shadow-btn-color: rgba(176, 109, 81, 0.2);
   --app-btn-offset: 1px;
+
+  /* Roles desaturados al 40% (Modo Claro / Boutique) */
+  --role-bg-l: 50%;
+  --role-bg-a: 0.12;
+  --role-border-l: 45%;
+  --role-border-a: 0.35;
+  --role-text-l: 36%;
+
+  /* Tareas desaturadas al 40% (Modo Claro / Boutique) */
+  --task-bg-l: 50%;
+  --task-bg-a: 0.12;
+  --task-border-l: 45%;
+  --task-border-a: 0.35;
+  --task-text-l: 36%;
+  --task-icon-bg-l: 50%;
+  --task-icon-bg-a: 0.14;
+  --task-icon-text-l: 38%;
 }
 
 [data-theme='nature'] {
@@ -46,6 +63,23 @@
   --app-shadow-btn-active: 0px 0px 0px #8C6F51, 0px 2px 5px rgba(0,0,0,0.4);
   --app-shadow-btn-color: #8C6F51;
   --app-btn-offset: 6px;
+
+  /* Roles desaturados al 40% (Modo Oscuro / Nature) */
+  --role-bg-l: 65%;
+  --role-bg-a: 0.22;
+  --role-border-l: 65%;
+  --role-border-a: 0.45;
+  --role-text-l: 80%;
+
+  /* Tareas desaturadas al 40% (Modo Oscuro / Nature) */
+  --task-bg-l: 65%;
+  --task-bg-a: 0.22;
+  --task-border-l: 65%;
+  --task-border-a: 0.45;
+  --task-text-l: 80%;
+  --task-icon-bg-l: 65%;
+  --task-icon-bg-a: 0.24;
+  --task-icon-text-l: 82%;
 }
 
 body {
@@ -77,3 +111,35 @@ body {
   transform: translateY(0);
   opacity: 0.5;
 }
+
+/* ========================================================
+   ESTILOS DE ROLES Y TAREAS CON SATURACIÓN FIJA DEL 40%
+   ======================================================== */
+
+/* Rol: Asumidor (Azul, saturación 40%) */
+.role-asumidor {
+  background-color: hsla(215, 40%, var(--role-bg-l), var(--role-bg-a)) !important;
+  border-color: hsla(215, 40%, var(--role-border-l), var(--role-border-a)) !important;
+  color: hsl(215, 40%, var(--role-text-l)) !important;
+}
+
+/* Rol: No Asumidor (Rosado, saturación 40%) */
+.role-noasumidor {
+  background-color: hsla(340, 40%, var(--role-bg-l), var(--role-bg-a)) !important;
+  border-color: hsla(340, 40%, var(--role-border-l), var(--role-border-a)) !important;
+  color: hsl(340, 40%, var(--role-text-l)) !important;
+}
+
+/* Tareas individuales: Toman --task-hue y usan siempre saturación 40% */
+.task-pill {
+  background-color: hsla(var(--task-hue, 42), 40%, var(--task-bg-l), var(--task-bg-a)) !important;
+  border-color: hsla(var(--task-hue, 42), 40%, var(--task-border-l), var(--task-border-a)) !important;
+  color: hsl(var(--task-hue, 42), 40%, var(--task-text-l)) !important;
+}
+
+.task-icon-box {
+  background-color: hsla(var(--task-hue, 42), 40%, var(--task-icon-bg-l), var(--task-icon-bg-a)) !important;
+  border-color: hsla(var(--task-hue, 42), 40%, var(--task-border-l), var(--task-border-a)) !important;
+  color: hsl(var(--task-hue, 42), 40%, var(--task-icon-text-l)) !important;
+}
+

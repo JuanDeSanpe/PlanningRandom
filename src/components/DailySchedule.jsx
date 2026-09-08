@@ -1,12 +1,6 @@
 import { useState } from 'react';
-import { ChefHat, CalendarCheck, Sun, CheckCircle2, Circle } from 'lucide-react';
-
-const getTaskIcon = (taskName) => {
-  if (taskName === 'Cocina') return <ChefHat size={20} />;
-  if (taskName === 'Reserva') return <CalendarCheck size={20} />;
-  if (taskName === 'Despertar') return <Sun size={20} />;
-  return <CheckCircle2 size={20} />;
-};
+import { Circle } from 'lucide-react';
+import { getTaskHue, getTaskBadgeText, TaskIcon } from '../utils/themeColors';
 
 export default function DailySchedule({ schedule, onGenerate, tasks }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -58,24 +52,36 @@ export default function DailySchedule({ schedule, onGenerate, tasks }) {
           <div className="grid gap-4 sm:grid-cols-2">
             {schedule.displaySchedule.map((assignment, idx) => {
               const taskInfo = tasks.find(t => t.id === assignment.taskId);
+              const taskName = taskInfo?.name || 'Tarea';
+              const taskType = taskInfo?.type || 'regular';
+              const hue = getTaskHue(taskName, taskType);
+              const badgeText = getTaskBadgeText(taskInfo);
+
               return (
                 <div 
                   key={idx} 
+                  style={{ animationDelay: `${idx * 150}ms`, '--task-hue': hue }}
                   className="bg-surface p-6 rounded-3xl border-t border-white/5 hover:border-primary/20 hover:shadow-md transition-all duration-500 card-3d-effect"
-                  style={{ animationDelay: `${idx * 150}ms` }}
                 >
-                  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-black/5">
-                    <div className="bg-primary/5 text-primary p-2.5 rounded-full">
-                      {getTaskIcon(taskInfo?.name)}
+                  <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b border-black/5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-full border task-icon-box">
+                        <TaskIcon name={taskName} type={taskType} size={18} />
+                      </div>
+                      <h4 className="font-serif text-lg text-textMain">{taskName}</h4>
                     </div>
-                    <h4 className="font-serif text-lg text-primary">{taskInfo?.name}</h4>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border task-pill">
+                      {badgeText}
+                    </span>
                   </div>
                   
                   <div className="space-y-2">
                     {assignment.users.map((user, i) => (
-                      <div key={i} className="flex items-center justify-between py-2">
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-black/5 last:border-0">
                         <span className="font-medium text-textMain">{user.name}</span>
-                        <span className="text-[10px] uppercase font-semibold tracking-wider px-3 py-1 rounded-full bg-black/5 text-textMuted">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          user.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'
+                        }`}>
                           {user.role.replace('-', ' ')}
                         </span>
                       </div>
