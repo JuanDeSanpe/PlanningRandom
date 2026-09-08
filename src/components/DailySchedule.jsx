@@ -77,7 +77,7 @@ export default function DailySchedule({ schedule, onGenerate, tasks, users = [] 
                   
                   <div className="space-y-2">
                     {assignment.users.map((user, i) => {
-                      const currentUser = users.find(u => u.id === user.id) || user;
+                      const currentUser = users.find(u => String(u.id) === String(user.id)) || users.find(u => u.name === user.name) || user;
                       return (
                         <div key={i} className="flex items-center justify-between py-2 border-b task-card-divider last:border-0">
                           <span className="font-medium text-textMain">{currentUser.name}</span>
