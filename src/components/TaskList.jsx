@@ -106,7 +106,7 @@ export default function TaskList({ tasks, onUpdate }) {
             <div 
               key={task.id} 
               style={{ '--task-hue': hue }}
-              className="bg-surface border-t border-white/5 p-4 rounded-3xl flex items-center justify-between group transition-all card-3d-effect"
+              className="task-card-capsule p-4 rounded-3xl flex items-center justify-between group transition-all card-3d-effect"
             >
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-full border task-icon-box transition-transform group-hover:scale-105">

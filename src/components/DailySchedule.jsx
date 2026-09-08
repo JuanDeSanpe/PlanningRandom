@@ -61,9 +61,9 @@ export default function DailySchedule({ schedule, onGenerate, tasks }) {
                 <div 
                   key={idx} 
                   style={{ animationDelay: `${idx * 150}ms`, '--task-hue': hue }}
-                  className="bg-surface p-6 rounded-3xl border-t border-white/5 hover:border-primary/20 hover:shadow-md transition-all duration-500 card-3d-effect"
+                  className="task-card-capsule p-6 rounded-3xl transition-all duration-500 card-3d-effect"
                 >
-                  <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b border-black/5">
+                  <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b task-card-divider">
                     <div className="flex items-center gap-3">
                       <div className="p-2.5 rounded-full border task-icon-box">
                         <TaskIcon name={taskName} type={taskType} size={18} />
@@ -77,7 +77,7 @@ export default function DailySchedule({ schedule, onGenerate, tasks }) {
                   
                   <div className="space-y-2">
                     {assignment.users.map((user, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b border-black/5 last:border-0">
+                      <div key={i} className="flex items-center justify-between py-2 border-b task-card-divider last:border-0">
                         <span className="font-medium text-textMain">{user.name}</span>
                         <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
                           user.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'

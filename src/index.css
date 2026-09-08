@@ -45,6 +45,13 @@
   --task-icon-bg-l: 50%;
   --task-icon-bg-a: 0.14;
   --task-icon-text-l: 38%;
+
+  /* Cápsula de tareas completa (Modo Claro / Boutique) */
+  --task-capsule-bg: linear-gradient(145deg, #ffffff 0%, hsla(var(--task-hue, 42), 40%, 93%, 0.85) 100%);
+  --task-capsule-border: hsla(var(--task-hue, 42), 40%, 65%, 0.35);
+  --task-capsule-border-hover: hsla(var(--task-hue, 42), 40%, 50%, 0.6);
+  --task-capsule-shadow: 0 6px 16px -2px hsla(var(--task-hue, 42), 40%, 25%, 0.08);
+  --task-capsule-divider: hsla(var(--task-hue, 42), 40%, 30%, 0.08);
 }
 
 [data-theme='nature'] {
@@ -80,6 +87,13 @@
   --task-icon-bg-l: 65%;
   --task-icon-bg-a: 0.24;
   --task-icon-text-l: 82%;
+
+  /* Cápsula de tareas completa (Modo Oscuro / Nature 3D) */
+  --task-capsule-bg: linear-gradient(145deg, hsla(var(--task-hue, 42), 40%, 21%, 0.96) 0%, hsla(var(--task-hue, 42), 40%, 15%, 0.98) 100%);
+  --task-capsule-border: hsla(var(--task-hue, 42), 40%, 55%, 0.38);
+  --task-capsule-border-hover: hsla(var(--task-hue, 42), 40%, 70%, 0.65);
+  --task-capsule-shadow: 8px 8px 20px rgba(0, 0, 0, 0.45), inset 0 1px 1px hsla(var(--task-hue, 42), 40%, 75%, 0.25);
+  --task-capsule-divider: hsla(var(--task-hue, 42), 40%, 70%, 0.12);
 }
 
 body {
@@ -141,5 +155,22 @@ body {
   background-color: hsla(var(--task-hue, 42), 40%, var(--task-icon-bg-l), var(--task-icon-bg-a)) !important;
   border-color: hsla(var(--task-hue, 42), 40%, var(--task-border-l), var(--task-border-a)) !important;
   color: hsl(var(--task-hue, 42), 40%, var(--task-icon-text-l)) !important;
+}
+
+/* Cápsula de tarea completa: fondo tintado con su color semántico (40% saturación) */
+.task-card-capsule {
+  background: var(--task-capsule-bg) !important;
+  border: 1px solid var(--task-capsule-border) !important;
+  box-shadow: var(--task-capsule-shadow) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-card-capsule:hover {
+  border-color: var(--task-capsule-border-hover) !important;
+  transform: translateY(-2px);
+}
+
+.task-card-divider {
+  border-color: var(--task-capsule-divider) !important;
 }
 

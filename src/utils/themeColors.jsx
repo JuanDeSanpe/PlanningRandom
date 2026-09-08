@@ -1,74 +1,98 @@
 import { Shield, ChefHat, Utensils, Sparkles, Shirt, PawPrint, Wrench, Car, ListTodo } from 'lucide-react';
 
-// Mapeo de tonos predefinidos para tareas estándar (con saturación fija del 40%)
+// Mapeo semántico de tonos por tipo de tarea (todos con saturación fija del 40%)
+// Relacionados con la naturaleza y función de la tarea:
 export const TASK_CONFIG = {
+  // Despertar: Sol de la mañana / Amanecer dorado (cálido y luminoso)
   'despertar': {
-    hue: 42,       // Dorado / Ámbar cálido (40% sat)
+    hue: 45,
     badge: 'PROTEGIDA VIP (Coordis)',
     icon: Shield,
+    concept: 'Amanecer / Sol'
   },
+  // Cocina: Fuego, fogón, pucheros, terracota cálido y acogedor
   'cocina': {
-    hue: 18,       // Terracota suave (40% sat)
+    hue: 18,
     badge: 'COCINA',
     icon: ChefHat,
+    concept: 'Fuego / Fogón / Terracota'
   },
+  // I. Comida: Huerta, verduras frescas, hojas, verde oliva / salvia
   'i. comida': {
-    hue: 95,       // Verde Oliva / Salvia (40% sat)
+    hue: 95,
     badge: 'REGULAR',
     icon: Utensils,
+    concept: 'Alimentos / Huerta / Salvia'
   },
+  // I. Limpieza: Agua limpia, jabón, frescura higiénica, cian / aguamarina
   'i. limpieza': {
-    hue: 175,      // Aqua / Turquesa suave (40% sat)
+    hue: 185,
     badge: 'REGULAR',
     icon: Sparkles,
+    concept: 'Agua / Jabón / Aguamarina'
   },
+  // Lavandería: Colada, suavizante, añil, índigo / azul perwinkle textil
   'lavandería': {
-    hue: 228,      // Azul Índigo suave (40% sat)
+    hue: 220,
     badge: 'REGULAR',
     icon: Shirt,
+    concept: 'Colada / Añil / Índigo textil'
   },
   'lavanderia': {
-    hue: 228,
+    hue: 220,
     badge: 'REGULAR',
     icon: Shirt,
+    concept: 'Colada / Añil / Índigo textil'
   },
+  // Animales: Campo abierto, flora silvestre, lavanda / púrpura natural
   'animales': {
-    hue: 280,      // Lavanda / Violeta suave (40% sat)
+    hue: 280,
     badge: 'REGULAR',
     icon: PawPrint,
+    concept: 'Campo / Lavanda silvestre'
   },
+  // Taller: Herramientas, mecánica, madera y bronce / óxido artesanal
   'taller': {
-    hue: 30,       // Bronce / Ocre tierra (40% sat)
+    hue: 32,
     badge: 'REGULAR',
     icon: Wrench,
+    concept: 'Herramientas / Bronce / Cobre'
   },
+  // A. Chófer: Carretera, asfalto, ruta verde abeto / transporte
   'a. chófer': {
-    hue: 145,      // Verde Esmeralda suave (40% sat)
+    hue: 155,
     badge: 'REGULAR',
     icon: Car,
+    concept: 'Ruta / Carretera / Abeto'
   },
   'a. chofer': {
-    hue: 145,
+    hue: 155,
     badge: 'REGULAR',
     icon: Car,
+    concept: 'Ruta / Carretera / Abeto'
   },
 };
 
-// Generador determinista de tonalidad para cualquier tarea personalizada (siempre 40% sat)
+// Generador de tonalidad (siempre con 40% de saturación)
 export const getTaskHue = (taskName = '', taskType = 'regular') => {
   const normalized = (taskName || '').trim().toLowerCase();
   
   if (normalized.includes('despertar') || taskType === 'protected') {
-    return 42;
+    return 45; // Amanecer solar
   }
   if (normalized === 'cocina' || taskType === 'cocina') {
-    return 18;
+    return 18; // Terracota fuego
   }
   if (TASK_CONFIG[normalized]) {
     return TASK_CONFIG[normalized].hue;
   }
   
-  // Hash consistente para tareas creadas manualmente
+  // Coincidencia parcial con palabras clave conocidas
+  for (const [key, cfg] of Object.entries(TASK_CONFIG)) {
+    if (normalized.includes(key)) return cfg.hue;
+  }
+  
+  // Hash consistente para tareas añadidas dinámicamente
   let hash = 0;
   for (let i = 0; i < normalized.length; i++) {
     hash = (hash << 5) - hash + normalized.charCodeAt(i);
