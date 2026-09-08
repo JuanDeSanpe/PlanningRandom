@@ -15,8 +15,16 @@ function App() {
   const [history, setHistory] = useState([]);
   const [todaySchedule, setTodaySchedule] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem('app-theme') || 'boutique');
+  const [pmSharedMode, setPmSharedMode] = useState(() => localStorage.getItem('app-pm-shared-mode') === 'true');
+
+  const handleTogglePmSharedMode = (isShared) => {
+    setPmSharedMode(isShared);
+    localStorage.setItem('app-pm-shared-mode', isShared ? 'true' : 'false');
+  };
 
   useEffect(() => {
+    document.documentElement.lang = 'es';
+    document.documentElement.setAttribute('translate', 'no');
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('app-theme', theme);
   }, [theme]);
@@ -48,7 +56,7 @@ function App() {
 
   const handleGenerate = () => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const newSchedule = generateDailySchedule(users, tasks, history);
+    const newSchedule = generateDailySchedule(users, tasks, history, { pmSharedMode });
     
     const flatAssignments = newSchedule.flatMap(s => 
       s.users.map(u => ({ taskId: s.taskId, userId: u.id }))
@@ -154,6 +162,8 @@ function App() {
             onGenerate={handleGenerate} 
             tasks={tasks}
             users={users}
+            pmSharedMode={pmSharedMode}
+            onTogglePmSharedMode={handleTogglePmSharedMode}
           />
         )}
         {activeTab === 'users' && (

@@ -148,7 +148,8 @@ body {
   color: hsl(340, 40%, var(--role-text-l)) !important;
 }
 
-/* Rol: Nuevo / Puesta en Marcha (Ámbar dorado, saturación 40%) */
+/* Rol: Ingreso / Puesta en Marcha (Ámbar dorado, saturación 40%) */
+.role-ingreso,
 .role-nuevo {
   background-color: hsla(38, 40%, var(--role-bg-l), var(--role-bg-a)) !important;
   border-color: hsla(38, 40%, var(--role-border-l), var(--role-border-a)) !important;

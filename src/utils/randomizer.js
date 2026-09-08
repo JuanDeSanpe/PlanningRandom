@@ -11,7 +11,7 @@ export const isPMTask = (task) => {
 
 export const isNewInPM = (user) => {
   if (!user) return false;
-  return user.active !== false && (user.role === 'nuevo' || user.inPM === true);
+  return user.active !== false && (user.role === 'ingreso' || user.role === 'nuevo' || user.inPM === true);
 };
 
 // Contar cuántos días lleva un nuevo usuario en Puesta en Marcha (máximo 7)
@@ -31,7 +31,8 @@ export const getNewUserPMDays = (userId, history = [], pmTaskId = null, tasks = 
   }, 0);
 };
 
-export const generateDailySchedule = (users, tasks, history) => {
+export const generateDailySchedule = (users, tasks, history, options = {}) => {
+  const { pmSharedMode = false } = options;
   const schedule = [];
   const availableUsers = new Set(users.map(u => u.id));
 
@@ -144,14 +145,21 @@ export const generateDailySchedule = (users, tasks, history) => {
     );
     candidateAsumidores = sortAsumidoresForPM(candidateAsumidores, pmTask.id);
 
-    // Selección de PMs según disponibilidad:
-    // Si hay suficientes asumidores: 1 PM distinto por cada nuevo usuario (ej. 2 nuevos = 2 PMs).
-    // Si hay escasez: 1 solo asumidor puede ser PM de 2 usuarios nuevos.
+    // Selección de PMs según disponibilidad y elección del usuario:
+    // Si pmSharedMode es true: 1 solo asumidor será PM de todos los ingresos.
+    // Si pmSharedMode es false: se intenta 1 PM distinto por cada ingreso (ej. 2 ingresos = 2 PMs).
+    // Si hay escasez de asumidores: se usa 1 solo asumidor como fallback.
     let selectedPMs = [];
-    if (candidateAsumidores.length >= activeNewUsers.length) {
-      selectedPMs = candidateAsumidores.slice(0, activeNewUsers.length);
-    } else if (candidateAsumidores.length > 0) {
-      selectedPMs = candidateAsumidores;
+    if (pmSharedMode) {
+      if (candidateAsumidores.length > 0) {
+        selectedPMs = [candidateAsumidores[0]];
+      }
+    } else {
+      if (candidateAsumidores.length >= activeNewUsers.length) {
+        selectedPMs = candidateAsumidores.slice(0, activeNewUsers.length);
+      } else if (candidateAsumidores.length > 0) {
+        selectedPMs = candidateAsumidores;
+      }
     }
 
     // Marcar los asumidores seleccionados como ocupados

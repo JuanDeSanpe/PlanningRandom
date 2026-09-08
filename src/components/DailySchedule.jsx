@@ -1,10 +1,19 @@
 import { useState } from 'react';
-import { Circle } from 'lucide-react';
+import { Circle, Users } from 'lucide-react';
 import { getTaskHue, getTaskBadgeText, TaskIcon } from '../utils/themeColors';
-import { isPMTask } from '../utils/randomizer';
+import { isPMTask, isNewInPM } from '../utils/randomizer';
 
-export default function DailySchedule({ schedule, onGenerate, tasks, users = [] }) {
+export default function DailySchedule({ 
+  schedule, 
+  onGenerate, 
+  tasks, 
+  users = [],
+  pmSharedMode = false,
+  onTogglePmSharedMode = () => {}
+}) {
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const activeIngresos = users.filter(u => u.active !== false && isNewInPM(u));
 
   const handleGenerateClick = () => {
     setIsGenerating(true);
@@ -25,6 +34,47 @@ export default function DailySchedule({ schedule, onGenerate, tasks, users = [] 
               ? "Aún no se han asignado las tareas para el día de hoy. Presiona el botón para sortear." 
               : "Las tareas han sido asignadas exitosamente. ¡A por todas!"}
           </p>
+
+          {activeIngresos.length >= 2 && !schedule && (
+            <div className="max-w-md mx-auto p-4 rounded-2xl bg-background/80 border border-primary/20 text-left space-y-2.5 card-3d-effect">
+              <div className="flex items-center gap-2">
+                <Users size={16} className="text-primary" />
+                <span className="text-xs font-serif text-primary font-medium">
+                  Modo Acompañamiento ({activeIngresos.length} ingresos activos):
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onTogglePmSharedMode(false)}
+                  className={`py-2 px-3 rounded-xl text-xs font-medium border transition-all ${
+                    !pmSharedMode 
+                      ? 'border-primary bg-primary/15 text-primary font-bold shadow-sm' 
+                      : 'border-black/5 bg-surface text-textMuted hover:border-black/15'
+                  }`}
+                >
+                  2 PMs (1 por ingreso)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onTogglePmSharedMode(true)}
+                  className={`py-2 px-3 rounded-xl text-xs font-medium border transition-all ${
+                    pmSharedMode 
+                      ? 'border-primary bg-primary/15 text-primary font-bold shadow-sm' 
+                      : 'border-black/5 bg-surface text-textMuted hover:border-black/15'
+                  }`}
+                >
+                  1 PM para ambos
+                </button>
+              </div>
+              <p className="text-[11px] text-textMuted italic text-center">
+                {!pmSharedMode 
+                  ? 'Cada ingreso tendrá su propio asumidor PM dedicado.' 
+                  : 'Un solo asumidor enseñará la rutina a ambos ingresos.'}
+              </p>
+            </div>
+          )}
+
           <button 
             onClick={handleGenerateClick}
             disabled={isGenerating || schedule}
@@ -81,7 +131,7 @@ export default function DailySchedule({ schedule, onGenerate, tasks, users = [] 
                       const currentUser = users.find(u => String(u.id) === String(user.id)) || users.find(u => u.name === user.name) || user;
                       const isPM = isPMTask(taskInfo);
                       const isThisPM = isPM && (user.pmRole === 'pm' || currentUser.role === 'asumidor');
-                      const isThisNew = isPM && (user.pmRole === 'nuevo' || currentUser.role === 'nuevo');
+                      const isThisIngreso = isPM && (user.pmRole === 'nuevo' || currentUser.role === 'ingreso' || currentUser.role === 'nuevo');
 
                       let roleClass = 'role-noasumidor';
                       let roleLabel = currentUser.role.replace('-', ' ');
@@ -89,15 +139,15 @@ export default function DailySchedule({ schedule, onGenerate, tasks, users = [] 
                       if (isThisPM) {
                         roleClass = 'role-pm';
                         roleLabel = 'PM';
-                      } else if (isThisNew) {
-                        roleClass = 'role-nuevo';
-                        roleLabel = 'NUEVO';
+                      } else if (isThisIngreso) {
+                        roleClass = 'role-ingreso';
+                        roleLabel = 'INGRESO';
                       } else if (currentUser.role === 'asumidor') {
                         roleClass = 'role-asumidor';
                         roleLabel = 'ASUMIDOR';
-                      } else if (currentUser.role === 'nuevo') {
-                        roleClass = 'role-nuevo';
-                        roleLabel = 'NUEVO';
+                      } else if (currentUser.role === 'ingreso' || currentUser.role === 'nuevo') {
+                        roleClass = 'role-ingreso';
+                        roleLabel = 'INGRESO';
                       }
 
                       return (

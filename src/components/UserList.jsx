@@ -129,10 +129,10 @@ export default function UserList({ users, onUpdate, tasks, history = [] }) {
               </button>
               <button
                 type="button"
-                onClick={() => setNewRole('nuevo')}
-                className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-medium transition-all border ${newRole === 'nuevo' ? 'role-nuevo font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                onClick={() => setNewRole('ingreso')}
+                className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-medium transition-all border ${newRole === 'ingreso' || newRole === 'nuevo' ? 'role-ingreso font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
-                Nuevo (P. Marcha)
+                Ingreso (Ámbar)
               </button>
             </div>
           </div>
@@ -181,8 +181,8 @@ export default function UserList({ users, onUpdate, tasks, history = [] }) {
               >
                 <div className="flex items-center justify-between border-b border-black/5 pb-3">
                   <h3 className="font-serif text-lg text-primary">Modificar Usuario</h3>
-                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${editRole === 'asumidor' ? 'role-asumidor' : editRole === 'nuevo' ? 'role-nuevo' : 'role-noasumidor'}`}>
-                    {editRole === 'nuevo' ? 'Puesta en marcha' : editRole.replace('-', ' ')}
+                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${editRole === 'asumidor' ? 'role-asumidor' : (editRole === 'ingreso' || editRole === 'nuevo') ? 'role-ingreso' : 'role-noasumidor'}`}>
+                    {editRole === 'ingreso' || editRole === 'nuevo' ? 'Ingreso' : editRole.replace('-', ' ')}
                   </span>
                 </div>
 
@@ -221,10 +221,10 @@ export default function UserList({ users, onUpdate, tasks, history = [] }) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setEditRole('nuevo')}
-                      className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all border ${editRole === 'nuevo' ? 'role-nuevo font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                      onClick={() => setEditRole('ingreso')}
+                      className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all border ${editRole === 'ingreso' || editRole === 'nuevo' ? 'role-ingreso font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
                     >
-                      Nuevo (P. Marcha)
+                      Ingreso (Ámbar)
                     </button>
                   </div>
                 </div>
@@ -250,9 +250,9 @@ export default function UserList({ users, onUpdate, tasks, history = [] }) {
                   </div>
                 </div>
 
-                {editRole === 'nuevo' && (
+                {(editRole === 'ingreso' || editRole === 'nuevo') && (
                   <div className="text-xs text-textMuted bg-primary/5 p-3 rounded-xl border border-primary/10 flex items-center justify-between">
-                    <span>Días completados en Puesta en Marcha:</span>
+                    <span>Días de Ingreso en Puesta en Marcha:</span>
                     <span className="font-bold text-primary font-serif text-sm">
                       {getNewUserPMDays(user.id, history, pmTask?.id, tasks)} / 7 días (límite)
                     </span>
@@ -294,28 +294,38 @@ export default function UserList({ users, onUpdate, tasks, history = [] }) {
                     {user.name} {user.active ? '' : <span className="text-xs text-textMuted font-sans italic ml-2">(De baja)</span>}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${user.role === 'asumidor' ? 'role-asumidor' : user.role === 'nuevo' ? 'role-nuevo' : 'role-noasumidor'}`}>
-                      {user.role === 'nuevo' ? 'Puesta en marcha' : user.role.replace('-', ' ')}
-                    </span>
-                    {user.role === 'nuevo' && (() => {
-                      const pmDays = getNewUserPMDays(user.id, history, pmTask?.id, tasks);
-                      const isCompleted = pmDays >= 7;
+                    {(() => {
+                      const isIngreso = user.role === 'ingreso' || user.role === 'nuevo';
+                      const roleClass = user.role === 'asumidor' ? 'role-asumidor' : isIngreso ? 'role-ingreso' : 'role-noasumidor';
+                      const roleText = isIngreso ? 'Ingreso' : user.role.replace('-', ' ');
+
                       return (
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${isCompleted ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-primary/20 bg-primary/5 text-primary'}`}>
-                            {isCompleted ? '✓ 7/7 días completados' : `Día ${pmDays + 1} de 7`}
+                        <>
+                          <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${roleClass}`}>
+                            {roleText}
                           </span>
-                          {isCompleted && (
-                            <button
-                              type="button"
-                              onClick={() => onUpdate(users.map(u => u.id === user.id ? { ...u, role: 'no-asumidor' } : u))}
-                              className="text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-primary text-surface hover:opacity-90 transition-all shadow-sm flex items-center gap-1"
-                              title="Completó el límite de 7 días. Haz clic para pasarlo a No Asumidor"
-                            >
-                              <Award size={11} /> Pasar a No Asumidor
-                            </button>
-                          )}
-                        </div>
+                          {isIngreso && (() => {
+                            const pmDays = getNewUserPMDays(user.id, history, pmTask?.id, tasks);
+                            const isCompleted = pmDays >= 7;
+                            return (
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${isCompleted ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-primary/20 bg-primary/5 text-primary'}`}>
+                                  {isCompleted ? '✓ 7/7 días completados' : `Día ${pmDays + 1} de 7 (Ingreso)`}
+                                </span>
+                                {isCompleted && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onUpdate(users.map(u => u.id === user.id ? { ...u, role: 'no-asumidor' } : u))}
+                                    className="text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-primary text-surface hover:opacity-90 transition-all shadow-sm flex items-center gap-1"
+                                    title="Completó el límite de 7 días. Haz clic para pasarlo a No Asumidor"
+                                  >
+                                    <Award size={11} /> Pasar a No Asumidor
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </>
                       );
                     })()}
                     {user.protectedTasks.length > 0 && (
