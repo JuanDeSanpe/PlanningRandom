@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Plus, Trash2, Shield, Power, PowerOff, Pencil, Check, X } from 'lucide-react';
+import { Plus, Trash2, Shield, Power, PowerOff, Pencil, Check, X, Award } from 'lucide-react';
 import { getTaskHue } from '../utils/themeColors';
+import { getNewUserPMDays, isPMTask } from '../utils/randomizer';
 
-export default function UserList({ users, onUpdate, tasks }) {
+export default function UserList({ users, onUpdate, tasks, history = [] }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newRole, setNewRole] = useState('asumidor');
@@ -15,6 +16,7 @@ export default function UserList({ users, onUpdate, tasks }) {
   const [editProtectedTasks, setEditProtectedTasks] = useState([]);
 
   const protectedTaskOptions = tasks.filter(t => t.type === 'protected' || t.type === 'cocina').map(t => t.name);
+  const pmTask = tasks.find(t => isPMTask(t));
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -109,21 +111,28 @@ export default function UserList({ users, onUpdate, tasks }) {
           </div>
           
           <div>
-            <label className="block text-sm font-serif text-primary mb-2">Nivel de Experiencia</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className="block text-sm font-serif text-primary mb-2">Nivel / Estado del Usuario</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <button
                 type="button"
                 onClick={() => setNewRole('asumidor')}
-                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'asumidor' ? 'role-asumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-medium transition-all border ${newRole === 'asumidor' ? 'role-asumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
                 Asumidor (Azul)
               </button>
               <button
                 type="button"
                 onClick={() => setNewRole('no-asumidor')}
-                className={`py-3 rounded-xl text-sm font-medium transition-all border ${newRole === 'no-asumidor' ? 'role-noasumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-medium transition-all border ${newRole === 'no-asumidor' ? 'role-noasumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
                 No Asumidor (Rosado)
+              </button>
+              <button
+                type="button"
+                onClick={() => setNewRole('nuevo')}
+                className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-medium transition-all border ${newRole === 'nuevo' ? 'role-nuevo font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+              >
+                Nuevo (P. Marcha)
               </button>
             </div>
           </div>
@@ -172,8 +181,8 @@ export default function UserList({ users, onUpdate, tasks }) {
               >
                 <div className="flex items-center justify-between border-b border-black/5 pb-3">
                   <h3 className="font-serif text-lg text-primary">Modificar Usuario</h3>
-                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${editRole === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'}`}>
-                    {editRole.replace('-', ' ')}
+                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${editRole === 'asumidor' ? 'role-asumidor' : editRole === 'nuevo' ? 'role-nuevo' : 'role-noasumidor'}`}>
+                    {editRole === 'nuevo' ? 'Puesta en marcha' : editRole.replace('-', ' ')}
                   </span>
                 </div>
 
@@ -194,21 +203,28 @@ export default function UserList({ users, onUpdate, tasks }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-serif text-primary mb-1.5">Nivel de Experiencia</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-xs font-serif text-primary mb-1.5">Nivel / Estado del Usuario</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => setEditRole('asumidor')}
-                      className={`py-2.5 rounded-xl text-xs font-medium transition-all border ${editRole === 'asumidor' ? 'role-asumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                      className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all border ${editRole === 'asumidor' ? 'role-asumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
                     >
                       Asumidor (Azul)
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditRole('no-asumidor')}
-                      className={`py-2.5 rounded-xl text-xs font-medium transition-all border ${editRole === 'no-asumidor' ? 'role-noasumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                      className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all border ${editRole === 'no-asumidor' ? 'role-noasumidor font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
                     >
                       No Asumidor (Rosado)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditRole('nuevo')}
+                      className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all border ${editRole === 'nuevo' ? 'role-nuevo font-semibold shadow-sm border-current' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
+                    >
+                      Nuevo (P. Marcha)
                     </button>
                   </div>
                 </div>
@@ -233,6 +249,15 @@ export default function UserList({ users, onUpdate, tasks }) {
                     })}
                   </div>
                 </div>
+
+                {editRole === 'nuevo' && (
+                  <div className="text-xs text-textMuted bg-primary/5 p-3 rounded-xl border border-primary/10 flex items-center justify-between">
+                    <span>Días completados en Puesta en Marcha:</span>
+                    <span className="font-bold text-primary font-serif text-sm">
+                      {getNewUserPMDays(user.id, history, pmTask?.id, tasks)} / 7 días (límite)
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex gap-2 pt-2 justify-end">
                   <button 
@@ -269,9 +294,30 @@ export default function UserList({ users, onUpdate, tasks }) {
                     {user.name} {user.active ? '' : <span className="text-xs text-textMuted font-sans italic ml-2">(De baja)</span>}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${user.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'}`}>
-                      {user.role.replace('-', ' ')}
+                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${user.role === 'asumidor' ? 'role-asumidor' : user.role === 'nuevo' ? 'role-nuevo' : 'role-noasumidor'}`}>
+                      {user.role === 'nuevo' ? 'Puesta en marcha' : user.role.replace('-', ' ')}
                     </span>
+                    {user.role === 'nuevo' && (() => {
+                      const pmDays = getNewUserPMDays(user.id, history, pmTask?.id, tasks);
+                      const isCompleted = pmDays >= 7;
+                      return (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${isCompleted ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-primary/20 bg-primary/5 text-primary'}`}>
+                            {isCompleted ? '✓ 7/7 días completados' : `Día ${pmDays + 1} de 7`}
+                          </span>
+                          {isCompleted && (
+                            <button
+                              type="button"
+                              onClick={() => onUpdate(users.map(u => u.id === user.id ? { ...u, role: 'no-asumidor' } : u))}
+                              className="text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-primary text-surface hover:opacity-90 transition-all shadow-sm flex items-center gap-1"
+                              title="Completó el límite de 7 días. Haz clic para pasarlo a No Asumidor"
+                            >
+                              <Award size={11} /> Pasar a No Asumidor
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
                     {user.protectedTasks.length > 0 && (
                       user.protectedTasks.map(taskName => (
                         <span 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Circle } from 'lucide-react';
 import { getTaskHue, getTaskBadgeText, TaskIcon } from '../utils/themeColors';
+import { isPMTask } from '../utils/randomizer';
 
 export default function DailySchedule({ schedule, onGenerate, tasks, users = [] }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -78,13 +79,32 @@ export default function DailySchedule({ schedule, onGenerate, tasks, users = [] 
                   <div className="space-y-2">
                     {assignment.users.map((user, i) => {
                       const currentUser = users.find(u => String(u.id) === String(user.id)) || users.find(u => u.name === user.name) || user;
+                      const isPM = isPMTask(taskInfo);
+                      const isThisPM = isPM && (user.pmRole === 'pm' || currentUser.role === 'asumidor');
+                      const isThisNew = isPM && (user.pmRole === 'nuevo' || currentUser.role === 'nuevo');
+
+                      let roleClass = 'role-noasumidor';
+                      let roleLabel = currentUser.role.replace('-', ' ');
+
+                      if (isThisPM) {
+                        roleClass = 'role-pm';
+                        roleLabel = 'PM';
+                      } else if (isThisNew) {
+                        roleClass = 'role-nuevo';
+                        roleLabel = 'NUEVO';
+                      } else if (currentUser.role === 'asumidor') {
+                        roleClass = 'role-asumidor';
+                        roleLabel = 'ASUMIDOR';
+                      } else if (currentUser.role === 'nuevo') {
+                        roleClass = 'role-nuevo';
+                        roleLabel = 'NUEVO';
+                      }
+
                       return (
                         <div key={i} className="flex items-center justify-between py-2 border-b task-card-divider last:border-0">
                           <span className="font-medium text-textMain">{currentUser.name}</span>
-                          <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
-                            currentUser.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'
-                          }`}>
-                            {currentUser.role.replace('-', ' ')}
+                          <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${roleClass}`}>
+                            {roleLabel}
                           </span>
                         </div>
                       );

@@ -148,6 +148,21 @@ body {
   color: hsl(340, 40%, var(--role-text-l)) !important;
 }
 
+/* Rol: Nuevo / Puesta en Marcha (Ámbar dorado, saturación 40%) */
+.role-nuevo {
+  background-color: hsla(38, 40%, var(--role-bg-l), var(--role-bg-a)) !important;
+  border-color: hsla(38, 40%, var(--role-border-l), var(--role-border-a)) !important;
+  color: hsl(38, 40%, var(--role-text-l)) !important;
+}
+
+/* Rol: PM (Asumidor que enseña la casa en Puesta en Marcha) */
+.role-pm {
+  background-color: hsla(215, 40%, var(--role-bg-l), var(--role-bg-a)) !important;
+  border-color: hsla(38, 40%, var(--role-border-l), 0.8) !important;
+  color: hsl(38, 40%, var(--role-text-l)) !important;
+  font-weight: 700 !important;
+}
+
 /* Tareas individuales: Toman --task-hue y usan siempre saturación 40% */
 .task-pill {
   background-color: hsla(var(--task-hue, 42), 40%, var(--task-bg-l), var(--task-bg-a)) !important;

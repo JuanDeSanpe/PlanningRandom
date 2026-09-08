@@ -90,11 +90,21 @@ export default function TaskList({ tasks, onUpdate }) {
               <button
                 type="button"
                 onClick={() => setNewType('protected')}
-                style={{ '--task-hue': 42 }}
+                style={{ '--task-hue': (newName || '').toLowerCase().includes('despertar') ? 45 : 38 }}
                 className={`py-3 px-4 rounded-xl text-left text-sm font-medium transition-all border ${newType === 'protected' ? 'task-pill shadow-sm border-current font-semibold' : 'bg-background border-black/5 text-textMuted hover:border-black/10'}`}
               >
-                <div className="font-bold mb-0.5">Protegida VIP (Coordis)</div>
-                <div className="font-normal text-xs opacity-80">1 solo usuario VIP con protección (ej. Despertar)</div>
+                <div className="font-bold mb-0.5">
+                  {(newName || '').toLowerCase().includes('puesta en marcha') || (newName || '').toLowerCase().includes('mañana') || (newName || '').toLowerCase().includes('pm') || (newName || '').toLowerCase().includes('acompañ')
+                    ? 'Protegida (Acompañamiento)'
+                    : (newName || '').toLowerCase().includes('despertar')
+                    ? 'Protegida VIP (Coordis)'
+                    : 'Protegida'}
+                </div>
+                <div className="font-normal text-xs opacity-80">
+                  {(newName || '').toLowerCase().includes('puesta en marcha') || (newName || '').toLowerCase().includes('mañana') || (newName || '').toLowerCase().includes('pm') || (newName || '').toLowerCase().includes('acompañ')
+                    ? 'Asumidor rotativo de acompañamiento + Nuevo usuario'
+                    : '1 solo usuario VIP con protección (ej. Despertar)'}
+                </div>
               </button>
               <button
                 type="button"
@@ -174,10 +184,14 @@ export default function TaskList({ tasks, onUpdate }) {
                     <button
                       type="button"
                       onClick={() => setEditType('protected')}
-                      style={{ '--task-hue': 42 }}
+                      style={{ '--task-hue': (editName || task.name || '').toLowerCase().includes('despertar') ? 45 : 38 }}
                       className={`py-2 px-3 rounded-xl text-center text-xs font-medium transition-all border ${editType === 'protected' ? 'task-pill shadow-sm border-current font-semibold' : 'bg-background/80 border-black/5 text-textMuted hover:border-black/10'}`}
                     >
-                      Protegida VIP
+                      {(editName || task.name || '').toLowerCase().includes('despertar')
+                        ? 'Protegida VIP (Coordis)'
+                        : (editName || task.name || '').toLowerCase().includes('puesta en marcha') || (editName || task.name || '').toLowerCase().includes('mañana') || (editName || task.name || '').toLowerCase().includes('pm') || (editName || task.name || '').toLowerCase().includes('acompañ')
+                        ? 'Protegida (Acompañamiento)'
+                        : 'Protegida'}
                     </button>
                     <button
                       type="button"

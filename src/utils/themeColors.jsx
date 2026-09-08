@@ -1,4 +1,4 @@
-import { Shield, ChefHat, Utensils, Sparkles, Shirt, PawPrint, Wrench, Car, ListTodo } from 'lucide-react';
+import { Shield, ChefHat, Utensils, Sparkles, Shirt, PawPrint, Wrench, Car, ListTodo, HeartHandshake } from 'lucide-react';
 
 // Mapeo semántico de tonos por tipo de tarea (todos con saturación fija del 40%)
 // Relacionados con la naturaleza y función de la tarea:
@@ -9,6 +9,31 @@ export const TASK_CONFIG = {
     badge: 'PROTEGIDA VIP (Coordis)',
     icon: Shield,
     concept: 'Amanecer / Sol'
+  },
+  // Puesta en marcha PM / Mañana / Acompañamiento: Ámbar amanecer y apoyo
+  'puesta en marcha pm': {
+    hue: 38,
+    badge: 'PROTEGIDA (Acompañamiento)',
+    icon: HeartHandshake,
+    concept: 'Acompañamiento / Tutoría / Ámbar dorado'
+  },
+  'puesta en marcha': {
+    hue: 38,
+    badge: 'PROTEGIDA (Acompañamiento)',
+    icon: HeartHandshake,
+    concept: 'Acompañamiento / Tutoría / Ámbar dorado'
+  },
+  'mañana': {
+    hue: 38,
+    badge: 'PROTEGIDA (Acompañamiento)',
+    icon: HeartHandshake,
+    concept: 'Acompañamiento / Tutoría / Ámbar dorado'
+  },
+  'acompañamiento': {
+    hue: 38,
+    badge: 'PROTEGIDA (Acompañamiento)',
+    icon: HeartHandshake,
+    concept: 'Acompañamiento / Tutoría / Ámbar dorado'
   },
   // Cocina: Fuego, fogón, pucheros, terracota cálido y acogedor
   'cocina': {
@@ -77,12 +102,29 @@ export const TASK_CONFIG = {
 export const getTaskHue = (taskName = '', taskType = 'regular') => {
   const normalized = (taskName || '').trim().toLowerCase();
   
-  if (normalized.includes('despertar') || taskType === 'protected') {
+  if (
+    normalized.includes('puesta en marcha') || 
+    normalized.includes('mañana') || 
+    normalized.includes('acompañamiento') || 
+    normalized === 'pm' ||
+    normalized.startsWith('pm ') ||
+    normalized.endsWith(' pm')
+  ) {
+    return 38; // Ámbar amanecer
+  }
+
+  if (normalized.includes('despertar')) {
     return 45; // Amanecer solar
   }
+
   if (normalized === 'cocina' || taskType === 'cocina') {
     return 18; // Terracota fuego
   }
+
+  if (taskType === 'protected') {
+    return 45;
+  }
+
   if (TASK_CONFIG[normalized]) {
     return TASK_CONFIG[normalized].hue;
   }
@@ -103,18 +145,46 @@ export const getTaskHue = (taskName = '', taskType = 'regular') => {
 export const getTaskBadgeText = (task) => {
   if (!task) return 'REGULAR';
   const normalized = (task.name || '').trim().toLowerCase();
-  if (normalized.includes('despertar') || task.type === 'protected') {
+
+  if (normalized.includes('despertar')) {
     return 'PROTEGIDA VIP (Coordis)';
   }
+
+  if (
+    normalized.includes('puesta en marcha') || 
+    normalized.includes('mañana') || 
+    normalized.includes('acompañamiento') || 
+    normalized === 'pm' ||
+    normalized.startsWith('pm ') ||
+    normalized.endsWith(' pm')
+  ) {
+    return 'PROTEGIDA (Acompañamiento)';
+  }
+
+  if (task.type === 'protected') {
+    return 'PROTEGIDA VIP';
+  }
+
   if (task.type === 'cocina' || normalized === 'cocina') {
     return 'COCINA';
   }
+
   return 'REGULAR';
 };
 
 export const TaskIcon = ({ name = '', type = 'regular', size = 18, className = '' }) => {
   const norm = (name || '').trim().toLowerCase();
   
+  if (
+    norm.includes('puesta en marcha') || 
+    norm.includes('mañana') || 
+    norm.includes('acompañ') || 
+    norm === 'pm' ||
+    norm.startsWith('pm ') ||
+    norm.endsWith(' pm')
+  ) {
+    return <HeartHandshake size={size} className={className} />;
+  }
   if (norm.includes('despertar') || type === 'protected') return <Shield size={size} className={className} />;
   if (norm === 'cocina' || type === 'cocina') return <ChefHat size={size} className={className} />;
   if (norm.includes('comida')) return <Utensils size={size} className={className} />;

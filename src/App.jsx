@@ -161,6 +161,7 @@ function App() {
             users={users} 
             onUpdate={updateUserList} 
             tasks={tasks}
+            history={history}
           />
         )}
         {activeTab === 'tasks' && (

@@ -43,6 +43,7 @@ export const getInitialData = () => {
     { id: 't6', name: 'Animales', type: 'regular' },
     { id: 't7', name: 'Taller', type: 'regular' },
     { id: 't8', name: 'A. Chófer', type: 'regular' },
+    { id: 't9', name: 'Puesta en marcha PM', type: 'protected' },
   ];
 
   // Compatibilidad hacia atrás: Asegurar que los usuarios antiguos tengan la propiedad active
