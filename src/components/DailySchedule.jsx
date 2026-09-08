@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Circle } from 'lucide-react';
 import { getTaskHue, getTaskBadgeText, TaskIcon } from '../utils/themeColors';
 
-export default function DailySchedule({ schedule, onGenerate, tasks }) {
+export default function DailySchedule({ schedule, onGenerate, tasks, users = [] }) {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateClick = () => {
@@ -76,16 +76,19 @@ export default function DailySchedule({ schedule, onGenerate, tasks }) {
                   </div>
                   
                   <div className="space-y-2">
-                    {assignment.users.map((user, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b task-card-divider last:border-0">
-                        <span className="font-medium text-textMain">{user.name}</span>
-                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
-                          user.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'
-                        }`}>
-                          {user.role.replace('-', ' ')}
-                        </span>
-                      </div>
-                    ))}
+                    {assignment.users.map((user, i) => {
+                      const currentUser = users.find(u => u.id === user.id) || user;
+                      return (
+                        <div key={i} className="flex items-center justify-between py-2 border-b task-card-divider last:border-0">
+                          <span className="font-medium text-textMain">{currentUser.name}</span>
+                          <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
+                            currentUser.role === 'asumidor' ? 'role-asumidor' : 'role-noasumidor'
+                          }`}>
+                            {currentUser.role.replace('-', ' ')}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );

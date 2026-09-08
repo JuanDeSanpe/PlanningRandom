@@ -34,7 +34,15 @@ function App() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingToday = data.history.find(h => h.date === todayStr);
     if (existingToday) {
-      setTodaySchedule(existingToday);
+      const userMap = new Map(data.users.map(u => [u.id, u]));
+      const normalizedToday = {
+        ...existingToday,
+        displaySchedule: (existingToday.displaySchedule || []).map(item => ({
+          ...item,
+          users: item.users.map(u => userMap.get(u.id) || u)
+        }))
+      };
+      setTodaySchedule(normalizedToday);
     }
   }, []);
 
@@ -61,6 +69,32 @@ function App() {
   const updateUserList = (newUsers) => {
     setUsers(newUsers);
     saveUsers(newUsers);
+
+    // Actualizar nombres en el sorteo actual y en el historial persistido
+    const userMap = new Map(newUsers.map(u => [u.id, u]));
+
+    if (todaySchedule && todaySchedule.displaySchedule) {
+      const updatedTodaySchedule = {
+        ...todaySchedule,
+        displaySchedule: todaySchedule.displaySchedule.map(item => ({
+          ...item,
+          users: item.users.map(u => userMap.get(u.id) || u)
+        }))
+      };
+      setTodaySchedule(updatedTodaySchedule);
+    }
+
+    if (history && history.length > 0) {
+      const updatedHistory = history.map(rec => ({
+        ...rec,
+        displaySchedule: (rec.displaySchedule || []).map(item => ({
+          ...item,
+          users: (item.users || []).map(u => userMap.get(u.id) || u)
+        }))
+      }));
+      setHistory(updatedHistory);
+      saveHistory(updatedHistory);
+    }
   };
 
   const updateTaskList = (newTasks) => {
@@ -119,6 +153,7 @@ function App() {
             schedule={todaySchedule} 
             onGenerate={handleGenerate} 
             tasks={tasks}
+            users={users}
           />
         )}
         {activeTab === 'users' && (
